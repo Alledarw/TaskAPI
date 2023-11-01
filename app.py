@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 
 def get_task():
-    with open("task.json") as data:
+    with open("tasks.json") as data:
         return json.load(data)
 
 
@@ -26,7 +26,6 @@ def get_all_tasks():
 @app.route("/tasks/<int:task_id>", methods=["GET"])
 def get_single_task(task_id):
     tasks = get_task()
-    # return tasks[0]
     for task in tasks:
         if task["id"] == task_id:
             return task
@@ -39,7 +38,7 @@ def get_single_task(task_id):
 def add_new_task():
     tasks = get_task()
     tasks.append({"category": request.json.get("category"), "description": request.json.get("description")})
-    with open("task.json", "w") as data:
+    with open("tasks.json", "w") as data:
         json.dump(tasks, data)
     return {"msg": "Task added successfully!"}
 
@@ -60,7 +59,7 @@ def delete_task(task_id):
         tasks.remove(task_to_remove)
 
         # Update the JSON file with the modified task list
-        with open("task.json", "w") as data:
+        with open("tasks.json", "w") as data:
             json.dump(tasks, data)
 
         return jsonify({"msg": "Task deleted successfully!"})

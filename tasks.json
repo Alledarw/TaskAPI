@@ -1,0 +1,14 @@
+[
+  {
+    "id": 123,
+    "description": "Buy milk, eggs and bread",
+    "category": "Shopping",
+    "status": "pending"
+  },
+  {
+    "id": 124,
+    "description": "Empty Dishwasher",
+    "category": "Cleaning",
+    "status": "pending"
+  }
+]
