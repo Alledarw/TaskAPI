@@ -33,6 +33,17 @@ def get_single_task(task_id):
     return "task not found"
 
 
+# GET {categories}
+@app.route("/categories", methods=["GET"])
+def get_all_categories():
+    tasks = get_task()
+    categories = []
+    for task in tasks:
+        categories.append(task["category"])
+
+    return categories
+
+
 # POST (Not finished)
 @app.route("/tasks", methods=["POST"])
 def add_new_task():
@@ -65,6 +76,15 @@ def delete_task(task_id):
         return jsonify({"msg": "Task deleted successfully!"})
     else:
         return "Task not found", 404
+
+
+# PUT /tasks/{task_id} Uppdaterar en task med ett specifikt id.
+
+# PUT /tasks/{task_id}/complete Markerar en task som färdig.
+
+# GET /tasks/categories/ Hämtar alla olika kategorier.
+
+# GET /tasks/categories/{category_name} Hämtar alla tasks från en specifik kategori.
 
 
 if __name__ == '__main__':
