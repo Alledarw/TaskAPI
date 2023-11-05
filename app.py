@@ -44,6 +44,7 @@ def get_all_categories():
 
     return jsonify(categories)
 
+
 # GET {categories/category}
 @app.route("/categories/<category>", methods=["GET"])
 def get_category(category):
@@ -99,11 +100,35 @@ def delete_task(task_id):
         return "Task not found", 404
 
 
-# PUT /tasks/{task_id} Uppdaterar en task med ett specifikt id.
+# PUT /tasks/{task_id}
+@app.route("/tasks/<int:task_id>", methods=["PUT"])
+def update_task(task_id):
+    tasks = get_task()
 
-# PUT /tasks/{task_id}/complete Markerar en task som färdig.
+    for task in tasks:
+        if task["id"] == task_id:
+            task["id"] = request.json.get("id")
+            task["description"] = request.json.get("description")
+            task["category"] = request.json.get("category")
+            task["status"] = request.json.get("status")
+            with open("tasks.json", "w") as data:
+                json.dump(tasks, data)
 
-# GET /tasks/categories/{category_name} Hämtar alla tasks från en specifik kategori.
+            return jsonify({"msg": "updated task successfully!"})
+
+
+# PUT complete
+@app.route("/tasks/<int:task_id>/complete", methods=["PUT"])
+def change_status(task_id):
+    tasks = get_task()
+
+    for task in tasks:
+        if task["id"] == task_id:
+            task["status"] = "complete"
+            with open("tasks.json", "w") as data:
+                json.dump(tasks, data)
+
+            return jsonify({"msg": "Status changed successfully!"})
 
 
 if __name__ == '__main__':

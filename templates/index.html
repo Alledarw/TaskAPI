@@ -1,10 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Index Page</title>
+    <title>API Documentation</title>
 </head>
 <body>
-    <h1>Welcome to the Index Page</h1>
-    <p>This is the main page of your Flask web application.</p>
+    <h1>API Documentation</h1>
+
+    <h2>Get all tasks</h2>
+    <p><strong>Endpoint:</strong> GET /tasks</p>
+    <p><strong>Description:</strong> Get a list of all tasks.</p>
+
+     <h2>Get specific of task</h2>
+    <p><strong>Endpoint:</strong> GET /tasks/{task_id}</p>
+    <p><strong>Description:</strong> Get a specifik task by id.</p>
+
+    <h2>Create a new task</h2>
+    <p><strong>Endpoint:</strong> POST /api/tasks</p>
+    <p><strong>Description:</strong> Create a new task.</p>
+    <p><strong>Request JSON:</strong></p>
+    <pre>
+    {
+        "id": int,
+        "title": str,
+        "description": str
+    }
+    </pre>
 </body>
 </html>
