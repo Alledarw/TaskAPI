@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Documentation</title>
+</head>
+<body>
+    <h1>API Documentation</h1>
+
+    <h2>Get all tasks</h2>
+    <p><strong>Endpoint:</strong> GET /tasks</p>
+    <p><strong>Description:</strong> Get a list of all tasks.</p>
+
+    <h2>Get specific task</h2>
+    <p><strong>Endpoint:</strong> GET /tasks/{task_id}</p>
+    <p><strong>Description:</strong> Get a specifik task by id.</p>
+
+    <h2>Get all categories</h2>
+    <p><strong>Endpoint:</strong> GET /categories</p>
+    <p><strong>Description:</strong> Get a list of all categories.</p>
+
+    <h2>Get specific categories</h2>
+    <p><strong>Endpoint:</strong> GET /categories/category</p>
+    <p><strong>Description:</strong> Get specific category by name.</p>
+
+    <h2>Create a new task</h2>
+    <p><strong>Endpoint:</strong> POST /tasks</p>
+    <p><strong>Description:</strong> Create a new task.</p>
+    <p><strong>Request JSON:</strong></p>
+    <pre>
+    {
+        "id": int,
+        "title": str,
+        "description": str
+    }
+    </pre>
+
+    <h2>Delete a specific task</h2>
+    <p><strong>Endpoint:</strong> DELETE /tasks/{task_id}</p>
+    <p><strong>Description:</strong> Delete a specifik task by id.</p>
+
+    <h2>Update specific task</h2>
+    <p><strong>Endpoint:</strong> PUT /tasks/{task_id}</p>
+    <p><strong>Description:</strong> Update a specifik task by id.</p>
+    <p><strong>Request JSON: (optional to use all keys)</strong></p>
+    <pre>
+    {
+        "id": int,
+        "title": str,
+        "description": str
+    }
+    </pre>
+
+    <h2>Change status of a task</h2>
+    <p><strong>Endpoint:</strong> PUT /tasks/{task_id}/complete</p>
+    <p><strong>Description:</strong> Change status of a specific task by id.</p>
+
+    <h2>Add new task via frontend</h2>
+    <p><strong>Endpoint:</strong> GET /add</p>
+    <p><strong>Description:</strong> Add a new task via the form.</p>
+
+
+
+</body>
+</html>

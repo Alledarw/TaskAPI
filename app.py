@@ -14,8 +14,14 @@ def get_task():
 
 
 # API documentation
-@app.route("/", methods=["GET"])
+@app.route("/docs", methods=["GET"])
 def get_api_info():
+    return render_template('docs.html')
+
+
+# GET homepage
+@app.route("/", methods=["GET"])
+def get_homepage():
     return render_template('index.html')
 
 
@@ -23,7 +29,7 @@ def get_api_info():
 @app.route("/tasks", methods=["GET"])
 def get_all_tasks():
     tasks = get_task()
-    return tasks
+    return render_template('index.html', tasks=tasks)
 
 
 # GET {task_id}
@@ -37,15 +43,29 @@ def get_single_task(task_id):
     return jsonify({"error": "Task not found"}), 404
 
 
+@app.route("/search", methods=["GET"])
+def search_task_by_id():
+    task_id = request.args.get("task_id")
+    if task_id:
+        tasks = get_task()
+        for task in tasks:
+            if task["id"] == int(task_id):
+                return render_template('index.html', tasks=[task])
+    return render_template('index.html', error="Task not found")
+
+
 # GET {categories}
 @app.route("/categories", methods=["GET"])
 def get_all_categories():
     tasks = get_task()
     categories = []
     for task in tasks:
-        categories.append(task["category"])
+        # Check if the category exist, preventing duplicate categories
+        category = task["category"]
+        if category not in categories:
+            categories.append(category)
 
-    return jsonify(categories)
+    return render_template('index.html', categories=categories)
 
 
 # GET {categories/category}
@@ -56,7 +76,7 @@ def get_category(category):
     Uppercase_category = capitalize(category)
     tasks = get_task()
     for task in tasks:
-        # For developement testing
+        # For development testing
         print(task)
         print(task["category"])
         print(category)
@@ -69,7 +89,7 @@ def get_category(category):
         return jsonify({"error": "Category not found"}), 404
 
 
-# POST
+# POST new task
 @app.route("/tasks", methods=["POST"])
 def add_new_task():
     tasks = get_task()
@@ -160,7 +180,7 @@ def submit():
         "status": status
     }
 
-    # developement testing
+    # development testing
     print(task_data)
 
     tasks = get_task()
