@@ -6,8 +6,11 @@ app = Flask(__name__)
 
 
 def get_task():
-    with open("tasks.json") as data:
-        return json.load(data)
+    try:
+        with open("tasks.json") as data:
+            return json.load(data)
+    except FileNotFoundError:
+        return []
 
 
 # API documentation
@@ -31,7 +34,7 @@ def get_single_task(task_id):
         if task["id"] == task_id:
             return task
 
-    return jsonify({"msg": "task not found"})
+    return jsonify({"error": "Task not found"}), 404
 
 
 # GET {categories}
@@ -60,7 +63,10 @@ def get_category(category):
         if task["category"] == Uppercase_category:
             found_categories.append(task)
 
-    return jsonify(found_categories)
+    if found_categories:
+        return jsonify(found_categories)
+    else:
+        return jsonify({"error": "Category not found"}), 404
 
 
 # POST
@@ -129,6 +135,41 @@ def change_status(task_id):
                 json.dump(tasks, data)
 
             return jsonify({"msg": "Status changed successfully!"})
+
+
+# GET add new task via frontend
+@app.route("/add", methods=["GET"])
+def get_page():
+    return render_template("post_task.html")
+
+
+# POST adding the task after form submit
+@app.route("/submit", methods=["POST"])
+def submit():
+    # Get data from the form using request.form
+    id = request.form["id"]
+    description = request.form["description"]
+    category = request.form["category"]
+    status = request.form["status"]
+
+    # Create a Python dictionary with the form data
+    task_data = {
+        "id": id,
+        "description": description,
+        "category": category,
+        "status": status
+    }
+
+    # developement testing
+    print(task_data)
+
+    tasks = get_task()
+    tasks.append(task_data)
+
+    with open("tasks.json", "w") as data:
+        json.dump(tasks, data)
+
+    return jsonify({"msg": "Task added!"})
 
 
 if __name__ == '__main__':
