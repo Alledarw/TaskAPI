@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, abort
 import json
 from numpy.core.defchararray import capitalize
 
@@ -22,7 +22,7 @@ def require_secret_key(func):
     def wrapper(*args, **kwargs):
         provided_secret_key = request.headers.get("X-Secret-Key")
         if provided_secret_key != SECRET_KEY:
-            return jsonify({"error": "Unauthorized"}), 401
+            abort(401, "Unauthorized")
         return func(*args, **kwargs)
 
     return wrapper
@@ -54,8 +54,7 @@ def get_single_task(task_id):
     for task in tasks:
         if task["id"] == task_id:
             return task
-
-    return jsonify({"error": "Task not found"}), 404
+    abort(404, "Task not found")
 
 
 @app.route("/search", methods=["GET"])
@@ -66,7 +65,7 @@ def search_task_by_id():
         for task in tasks:
             if task["id"] == int(task_id):
                 return render_template('index.html', tasks=[task])
-    return render_template('index.html', error="Task not found")
+    abort(404, "Task not found")
 
 
 # GET {categories}
@@ -75,11 +74,10 @@ def get_all_categories():
     tasks = get_task()
     categories = []
     for task in tasks:
-        # Check if the category exist, preventing duplicate categories
+        # Check if the category exists, preventing duplicate categories
         category = task["category"]
         if category not in categories:
             categories.append(category)
-
     return render_template('index.html', categories=categories)
 
 
@@ -87,33 +85,48 @@ def get_all_categories():
 @app.route("/categories/<category>", methods=["GET"])
 def get_category(category):
     found_categories = []
-    # Browser automatically turn words into lower capital strings
-    Uppercase_category = capitalize(category)
+    # Browser automatically turns words into lowercase strings
+    uppercase_category = capitalize(category)
     tasks = get_task()
     for task in tasks:
-        # For development testing
-        print(task)
-        print(task["category"])
-        print(category)
-        if task["category"] == Uppercase_category:
+        if task["category"] == uppercase_category:
             found_categories.append(task)
-
     if found_categories:
         return jsonify(found_categories)
-    else:
-        return jsonify({"error": "Category not found"}), 404
+    abort(404, "Category not found")
 
 
 # POST new task
 @app.route("/tasks", methods=["POST"])
 def add_new_task():
+    # Check if the required fields are present in the JSON data
+    required_fields = ["id", "description", "category", "status"]
+    if not all(field in request.json for field in required_fields):
+        return jsonify({"error": "Incomplete data. Please provide all required fields."}), 400
+
+    # Extract data from the JSON request
+    id = request.json.get("id")
+    description = request.json.get("description")
+    category = request.json.get("category")
+    status = request.json.get("status")
+
+    # Validate the data
+    if not id or not description or not category or not status:
+        return jsonify({"error": "Invalid data. Please provide valid values for all fields."}), 400
+
+    new_task = {
+        "id": id,
+        "description": description,
+        "category": category,
+        "status": status
+    }
+
     tasks = get_task()
-    tasks.append({"id": request.json.get("id"),
-                  "description": request.json.get("description"),
-                  "category": request.json.get("category"),
-                  "status": request.json.get("status")})
+    tasks.append(new_task)
+
     with open("tasks.json", "w") as data:
         json.dump(tasks, data)
+
     return jsonify({"msg": "Task added successfully!"})
 
 
@@ -122,55 +135,47 @@ def add_new_task():
 @require_secret_key
 def delete_task(task_id):
     tasks = get_task()
-
-    # Check if the task with the specified task_id exists
-    task_to_remove = None
-    for task in tasks:
-        if task["id"] == task_id:
-            task_to_remove = task
-            break
-
+    task_to_remove = next((task for task in tasks if task["id"] == task_id), None)
     if task_to_remove is not None:
         tasks.remove(task_to_remove)
-
-        # Update the JSON file with the modified task list
         with open("tasks.json", "w") as data:
             json.dump(tasks, data)
-
         return jsonify({"msg": "Task deleted successfully!"})
-    else:
-        return "Task not found", 404
+    abort(404, "Task not found")
 
 
 # PUT /tasks/{task_id}
 @app.route("/tasks/<int:task_id>", methods=["PUT"])
 def update_task(task_id):
     tasks = get_task()
-
     for task in tasks:
         if task["id"] == task_id:
-            task["id"] = request.json.get("id")
-            task["description"] = request.json.get("description")
-            task["category"] = request.json.get("category")
-            task["status"] = request.json.get("status")
+            if "id" in request.json:
+                task["id"] = request.json["id"]
+            if "description" in request.json:
+                task["description"] = request.json["description"]
+            if "category" in request.json:
+                task["category"] = request.json["category"]
+            if "status" in request.json:
+                task["status"] = request.json["status"]
+
             with open("tasks.json", "w") as data:
                 json.dump(tasks, data)
-
-            return jsonify({"msg": "updated task successfully!"})
+            return jsonify({"msg": "Task updated successfully!"})
+    abort(404, "Task not found")
 
 
 # PUT complete
 @app.route("/tasks/<int:task_id>/complete", methods=["PUT"])
 def change_status(task_id):
     tasks = get_task()
-
     for task in tasks:
         if task["id"] == task_id:
             task["status"] = "complete"
             with open("tasks.json", "w") as data:
                 json.dump(tasks, data)
-
             return jsonify({"msg": "Status changed successfully!"})
+    abort(404, "Task not found")
 
 
 # GET add new task via frontend
@@ -182,11 +187,18 @@ def get_page():
 # POST adding the task after form submit
 @app.route("/submit", methods=["POST"])
 def submit():
-    # Get data from the form using request.form
+    # Check if the required fields are present in the form data
+    if "id" not in request.form or "description" not in request.form or "category" not in request.form or "status" not in request.form:
+        return jsonify({"error": "Incomplete data. Please provide all required fields."}), 400
+
     id = request.form["id"]
     description = request.form["description"]
     category = request.form["category"]
     status = request.form["status"]
+
+    # validate data
+    if not id or not description or not category or not status:
+        return jsonify({"error": "Invalid data. Please provide valid values for all fields."}), 400
 
     # Create a Python dictionary with the form data
     task_data = {
@@ -196,35 +208,26 @@ def submit():
         "status": status
     }
 
-    # development testing
-    print(task_data)
-
     tasks = get_task()
     tasks.append(task_data)
 
     with open("tasks.json", "w") as data:
         json.dump(tasks, data)
 
-    return jsonify({"msg": "Task added!"})
+    return jsonify({"msg": "Task added successfully!"})
 
 
 # PUT /tasks/{task_id}
 @app.route("/tasks/<int:task_id>/incomplete", methods=["PUT"])
 def change_status_incomplete(task_id):
     tasks = get_task()
-
     for task in tasks:
         if task["id"] == task_id:
             task["status"] = "incomplete"
             with open("tasks.json", "w") as data:
                 json.dump(tasks, data)
-
             return jsonify({"msg": "Status changed successfully!"})
-
-
-# LEFT TO DO---------------------------------------
-# Error messages for each endpoint
-# flask testing
+    abort(404, "Task not found")
 
 
 if __name__ == '__main__':
