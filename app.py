@@ -207,6 +207,21 @@ def submit():
 
     return jsonify({"msg": "Task added!"})
 
+
+# PUT /tasks/{task_id}
+@app.route("/tasks/<int:task_id>/incomplete", methods=["PUT"])
+def change_status_incomplete(task_id):
+    tasks = get_task()
+
+    for task in tasks:
+        if task["id"] == task_id:
+            task["status"] = "incomplete"
+            with open("tasks.json", "w") as data:
+                json.dump(tasks, data)
+
+            return jsonify({"msg": "Status changed successfully!"})
+
+
 # LEFT TO DO---------------------------------------
 # Error messages for each endpoint
 # flask testing
