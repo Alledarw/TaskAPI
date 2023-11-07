@@ -2,46 +2,53 @@
 <html>
 <head>
     <title>Task Management API</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Task Management API</h1>
-    <p>Welcome to the Task Management API. Use the following links and forms:</p>
+    <div class="container">
+        <h1 class="mt-5">Task Management API</h1>
+        <p>Welcome to the Task Management API. Use the following links and forms:</p>
 
-    <h2>Get All Tasks</h2>
-    <form method="GET" action="/tasks">
-        <input type="submit" value="Get All Tasks">
-    </form>
+        <h2 class="mt-4">Get All Tasks</h2>
+        <form class="form-group" method="GET" action="/tasks">
+            <button type="submit" class="btn btn-primary">Get All Tasks</button>
+        </form>
 
-    <h2>Get All Categories</h2>
-    <form method="GET" action="/categories">
-        <input type="submit" value="Get All Categories">
-    </form>
+        <h2 class="mt-4">Get All Categories</h2>
+        <form class="form-group" method="GET" action="/categories">
+            <button type="submit" class="btn btn-primary">Get All Categories</button>
+        </form>
 
-    <h2>Search Task by ID</h2>
-    <form method="GET" action="/search">
-    Task ID: <input type="number" name="task_id" min="1">
-    <input type="submit" value="Search">
-    </form>
+        <h2 class="mt-4">Search Task by ID</h2>
+        <form class="form-group" method="GET" action="/search">
+            <div class="form-group">
+                <label for="task_id">Task ID:</label>
+                <input type="number" id="task_id" name="task_id" min="1" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Search</button>
+        </form>
 
+        <!-- Here, you can display the results if available -->
+        {% if tasks %}
+        <h2 class="mt-4">All Tasks</h2>
+        <ul class="list-group">
+            {% for task in tasks %}
+            <li class="list-group-item">ID: {{ task.id }} - Description: {{ task.description }} - Category: {{ task.category }} - Status: {{ task.status }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
 
-    <!-- Here, you can display the results if available -->
-    {% if tasks %}
-    <h2>All Tasks</h2>
-    <ul>
-        {% for task in tasks %}
-        <li>ID: {{ task.id }} - Description: {{ task.description }} - Category: {{ task.category }} - Status: {{ task.status }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+        <!-- Display categories if available -->
+        {% if categories %}
+        <h2 class="mt-4">All Categories</h2>
+        <ul class="list-group">
+            {% for category in categories %}
+            <li class="list-group-item">{{ category }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
 
-    <!-- Display categories if available -->
-    {% if categories %}
-    <h2>All Categories</h2>
-    <ul>
-        {% for category in categories %}
-        <li>{{ category }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

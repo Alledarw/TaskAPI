@@ -13,6 +13,21 @@ def get_task():
         return []
 
 
+# For using DELETE
+SECRET_KEY = "Testkey"
+
+
+# Custom decorator to check the secret key
+def require_secret_key(func):
+    def wrapper(*args, **kwargs):
+        provided_secret_key = request.headers.get("X-Secret-Key")
+        if provided_secret_key != SECRET_KEY:
+            return jsonify({"error": "Unauthorized"}), 401
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 # API documentation
 @app.route("/docs", methods=["GET"])
 def get_api_info():
@@ -104,6 +119,7 @@ def add_new_task():
 
 # DELETE {task_id}
 @app.route("/tasks/<int:task_id>", methods=["DELETE"])
+@require_secret_key
 def delete_task(task_id):
     tasks = get_task()
 
@@ -190,6 +206,10 @@ def submit():
         json.dump(tasks, data)
 
     return jsonify({"msg": "Task added!"})
+
+# LEFT TO DO---------------------------------------
+# Error messages for each endpoint
+# flask testing
 
 
 if __name__ == '__main__':
