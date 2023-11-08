@@ -229,6 +229,30 @@ def change_status_incomplete(task_id):
             return jsonify({"msg": "Status changed successfully!"})
     abort(404, "Task not found")
 
+#PUT  add new value in task {important}
+@app.route("/tasks/<int:task_id>/important", methods=["PUT"])
+def set_important(task_id):
+    tasks = get_task()
+    for task in tasks:
+        if task["id"] == task_id:
+            # Check if only one key is provided in the JSON data
+            if len(request.json) != 1:
+                return jsonify({"error": "Only one key is allowed in the request."}), 400
+
+            # Check if the key is "value"
+            if "value" not in request.json:
+                return jsonify({"error": "The 'value' key is required."}), 400
+
+            # Update the task's "value" key
+            task["value"] = request.json["value"]
+
+            with open("tasks.json", "w") as data:
+                json.dump(tasks, data)
+
+            return jsonify({"msg": "Value added successfully!"})
+
+        return jsonify({"error": "Task not found."}), 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)

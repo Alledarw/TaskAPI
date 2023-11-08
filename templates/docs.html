@@ -71,6 +71,16 @@
         <p><strong>Endpoint:</strong> GET /add</p>
         <p><strong>Description:</strong> Add a new task via the form.</p>
 
+        <h2 class="mt-4">Add new key (important)</h2>
+        <p><strong>Endpoint:</strong> PUT /tasks/{task_id}/important</p>
+        <p><strong>Description:</strong> Adds a new key value "important".</p>
+        <p><strong>Request JSON: (need to use "value" as a key)</strong></p>
+        <pre>
+        {
+            "value": "important"
+        }
+        </pre>
+
         <h2 class="mt-4">Run test_app.py</h2>
         <p><strong>Endpoint:</strong> pytest test_app.py</p>
         <p><strong>Description:</strong> Perfom tests on the API app. Run it with terminal</p>
