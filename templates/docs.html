@@ -71,6 +71,21 @@
         <p><strong>Endpoint:</strong> GET /add</p>
         <p><strong>Description:</strong> Add a new task via the form.</p>
 
+        <h2 class="mt-4">Delete all tasks</h2>
+        <p><strong>Endpoint:</strong> DELETE /tasks/delete-all</p>
+        <p><strong>Description:</strong> Delete all tasks.</p>
+        <p><strong>Request Headers:</strong></p>
+        <pre>
+        {
+            "Key": X-Secret-key,
+            "Value": Testkey
+        }
+        </pre>
+
+        <h2 class="mt-4">Get all tasks from a specific category</h2>
+        <p><strong>Endpoint:</strong> GET /completed-tasks/category</p>
+        <p><strong>Description:</strong>Get all tasks from a category</p>
+
         <h2 class="mt-4">Add new key (important)</h2>
         <p><strong>Endpoint:</strong> PUT /tasks/{task_id}/important</p>
         <p><strong>Description:</strong> Adds a new key value "important".</p>

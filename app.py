@@ -269,8 +269,8 @@ def set_important(task_id):
 
         return jsonify({"error": "Task not found."}), 404
 
-#DELETE all tasks
 
+# DELETE all tasks
 @app.route("/tasks/delete-all", methods=["DELETE"])
 @require_secret_key
 def delete_all_tasks():
@@ -280,7 +280,7 @@ def delete_all_tasks():
     return jsonify({"msg": "All tasks deleted successfully!"})
 
 
-#GET completed tasks in a specific category
+# GET completed tasks in a specific category
 @app.route("/completed-tasks/<category>", methods=["GET"])
 def get_completed_tasks_in_category(category):
     tasks = get_task()
