@@ -269,6 +269,32 @@ def set_important(task_id):
 
         return jsonify({"error": "Task not found."}), 404
 
+#DELETE all tasks
+
+@app.route("/tasks/delete-all", methods=["DELETE"])
+@require_secret_key
+def delete_all_tasks():
+    tasks = []
+    with open("tasks.json", "w") as data:
+        json.dump(tasks, data)
+    return jsonify({"msg": "All tasks deleted successfully!"})
+
+
+#GET completed tasks in a specific category
+@app.route("/completed-tasks/<category>", methods=["GET"])
+def get_completed_tasks_in_category(category):
+    tasks = get_task()
+    completed_tasks = []
+
+    for task in tasks:
+        if task["category"] == category and task["status"] == "complete":
+            completed_tasks.append(task)
+
+    if not completed_tasks:
+        abort(404, "No completed tasks found in the specified category.")
+
+    return jsonify(completed_tasks)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
