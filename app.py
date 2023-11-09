@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify, abort
 import json
 from numpy.core.defchararray import capitalize
+from functools import wraps
 
 app = Flask(__name__)
 
@@ -19,6 +20,7 @@ SECRET_KEY = "Testkey"
 
 # Custom decorator to check the secret key
 def require_secret_key(func):
+    @wraps(func)  # Preserve metadata of the original function
     def wrapper(*args, **kwargs):
         provided_secret_key = request.headers.get("X-Secret-Key")
         if provided_secret_key != SECRET_KEY:
@@ -104,8 +106,14 @@ def add_new_task():
     if not all(field in request.json for field in required_fields):
         return jsonify({"error": "Incomplete data. Please provide all required fields."}), 400
 
-    # Extract data from the JSON request
-    id = request.json.get("id")
+    # Extract data from the JSON request and make sure that the id is an int
+    id_str = request.json.get("id")
+
+    try:
+        id = int(id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid 'id' value. Please provide a valid integer."}), 400
+
     description = request.json.get("description")
     category = request.json.get("category")
     status = request.json.get("status")
@@ -191,7 +199,14 @@ def submit():
     if "id" not in request.form or "description" not in request.form or "category" not in request.form or "status" not in request.form:
         return jsonify({"error": "Incomplete data. Please provide all required fields."}), 400
 
-    id = request.form["id"]
+    # Extract data from the index.html form and make sure that the id is an int
+    id_str = request.form["id"]
+
+    try:
+        id = int(id_str)
+    except ValueError:
+        return jsonify({"error": "Invalid 'id' value. Please provide a valid integer."}), 400
+
     description = request.form["description"]
     category = request.form["category"]
     status = request.form["status"]
@@ -229,7 +244,8 @@ def change_status_incomplete(task_id):
             return jsonify({"msg": "Status changed successfully!"})
     abort(404, "Task not found")
 
-#PUT  add new value in task {important}
+
+# PUT  add new value in task {important}
 @app.route("/tasks/<int:task_id>/important", methods=["PUT"])
 def set_important(task_id):
     tasks = get_task()
